@@ -1,0 +1,493 @@
+openapi: 3.0.3
+info:
+  title: Filmbase - OpenAPI 3.0
+  description: |-
+    The Filmbase - place to store your favourite film information
+  version: 1.0.11
+servers:
+  - url: https://filmbase.io/api/v1
+paths:
+  /actor:
+    post:
+      tags:
+        - actor
+      summary: Create an actor information
+      description: Create a new actor in database
+      operationId: createActor
+      requestBody:
+        description: Create a new actor in the filmbase
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Actor'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Actor'          
+        '400':
+          description: Invalid ID supplied
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '422':
+          description: Validation exception
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '403':
+          description: Forbidden:authorization failure
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      
+    put:
+      tags:
+        - actor
+      summary: Change actor information
+      description: Change fields of existing actor entity
+      operationId: putActor
+      requestBody:
+        description: Change existing actor
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Actor'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Actor'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '422':
+          description: Validation exception
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '403':
+          description: Forbidden:authorization failure
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      
+            
+  /actor/{actorId}:  
+    delete:
+      tags:
+        - actor
+      summary: Delete actor information
+      description: Delete actor from the filmbase
+      operationId: deleteActor
+      parameters:
+        - name: actorId
+          in: path
+          description: Actor id to delete
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '400':
+          description: Invalid actor value
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '403':
+          description: Forbidden:authorization failure
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+     
+            
+  /actor/films:
+    get:
+      tags:
+        - actorFilm
+      summary: Get an actor's films information
+      description: Get information about actor films
+      operationId: getActorFilms
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ActorFilms'          
+        '400':
+          description: Invalid ID supplied
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '403':
+          description: Forbidden:authorization failure
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      
+            
+  /actor/{actorId}/{filmId}:
+    post:
+      tags:
+        - actorFilm
+      summary: Add a film information to actor
+      description: Add a film to actor
+      operationId: postActorFilm
+      parameters:
+        - name: actorId
+          in: path
+          description: Actor id to add film to
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: filmId
+          in: path
+          description: Film id to add
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActorFilms'          
+        '400':
+          description: Invalid ID supplied
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '403':
+          description: Forbidden:authorization failure
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      
+            
+  /film/search:
+    get:
+      tags:
+        - film
+      summary: Get film information with with searching by fields
+      description: Searching can be performed by a film name and/or an actor name. Sorting operations are available
+      operationId: getFilmSearch
+      parameters:
+        - name: filmName
+          in: query
+          description: Film name fragment
+          required: true
+          schema:
+            type: string
+        - name: actorName
+          in: query
+          description: Actor name fragment
+          required: true
+          schema:
+            type: string
+        - name: sortBy
+          in: query
+          description: Sorting field
+          required: false
+          schema:
+            type: string
+            enum:
+              - name
+              - rating
+              - release
+        - name: sortKey
+          in: query
+          description: Sorting key
+          required: false
+          schema:
+            type: string
+            enum:
+              - desc
+              - asc
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ActorFilms'          
+        '400':
+          description: Invalid sorting keys
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '403':
+          description: Forbidden:authorization failure
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      
+  /film:
+    get:
+      tags:
+        - film
+      summary: Get film information with sorting
+      description: Default sorting field is rating (DESC)
+      operationId: getFilm
+      parameters:
+        - name: sortBy
+          in: query
+          description: Sorting field
+          required: false
+          schema:
+            type: string
+            enum:
+              - name
+              - rating
+              - release
+        - name: sortKey
+          in: query
+          description: Sorting key
+          required: false
+          schema:
+            type: string
+            enum:
+              - desc
+              - asc
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ActorFilms'          
+        '400':
+          description: Invalid sorting keys
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '403':
+          description: Forbidden:authorization failure
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+     
+    post:
+      tags:
+        - film
+      summary: Create a film information
+      description: Create a new film in database
+      operationId: createFilm
+      requestBody:
+        description: New film information
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Film'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Film'          
+        '400':
+          description: Invalid ID supplied
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '422':
+          description: Validation exception
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '403':
+          description: Forbidden:authorization failure
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+     
+    put:
+      tags:
+        - film
+      summary: Change a film information
+      description: Change information about existing film
+      operationId: changeFilm
+      requestBody:
+        description: New film information
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Film'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Film'          
+        '400':
+          description: Invalid ID supplied
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '422':
+          description: Validation exception
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '403':
+          description: Forbidden:authorization failure
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      
+  /film/{filmId}:
+    delete:
+      tags:
+        - film
+      summary: Delete film information
+      description: Delete film from the filmbase
+      operationId: deleteFilm
+      parameters:
+        - name: filmId
+          in: path
+          description: Film id to delete
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '400':
+          description: Invalid film value
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '403':
+          description: Forbidden:authorization failure
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      
+  
+components:
+  
+  schemas:
+    Actor:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 10
+        name:
+          type: string
+          format: string
+          example: John Shishkin
+        gender:
+          type: string
+          format: string
+          example: male
+          enum:
+            - male
+            - female
+        birthdate:
+          type: string
+          format: date
+    Film:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 10
+        name:
+          type: string
+          example: "Bladerunner 2049"
+        description:
+          type: string
+          example: "Default Vilnev picture"
+        release_date:
+          type: string
+          format: date
+        rating:
+          type: integer
+          format: int32
+          example: 10
+          enum:
+            - 0
+            - 1
+            - 2
+            - 3
+            - 4
+            - 5
+            - 6
+            - 7
+            - 8
+            - 9
+            - 10
+    ActorFilms:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 10
+        actor:
+          type: object
+          $ref: '#/components/schemas/Actor'
+        films:
+          type: array
+          items:
+            $ref: '#/components/schemas/Film'
+    Response:
+      type: object
+      properties:
+        code:
+          type: integer
+          format: int32
+          example: 404
+        error:
+          type: string
+          format: error
+          example: "Unauthorized"
+        responseBody:
+          type: object
